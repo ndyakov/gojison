@@ -11,12 +11,49 @@ func (p Params) Add(key string, value interface{}) {
 	p[key] = value
 }
 
+func (p Params) GetP(key string) Params {
+	if val, ok := p[key]; ok {
+		return Params(val.(map[string]interface{}))
+	}
+
+	return Params{}
+}
+
 func (p Params) Get(key string) string {
 	if val, ok := p[key]; ok {
 		return fmt.Sprintf("%v", val)
 	}
 
 	return ""
+}
+
+func (p Params) GetString(key string) string {
+	if val, ok := p[key]; ok {
+		if vs, ok := val.(string); ok {
+			return vs
+		}
+	}
+	return ""
+}
+
+func (p Params) GetInt(key string) int {
+	if val, ok := p[key]; ok {
+		if vi, ok := val.(int); ok {
+			return vi
+		}
+	}
+
+	return 0
+}
+
+func (p Params) GetFloat(key string) float64 {
+	if val, ok := p[key]; ok {
+		if vf, ok := val.(float64); ok {
+			return vf
+		}
+	}
+
+	return 0
 }
 
 func (p Params) GetI(key string) interface{} {
@@ -27,15 +64,7 @@ func (p Params) GetI(key string) interface{} {
 	return nil
 }
 
-func (p Params) GetP(key string) Params {
-	if val, ok := p[key]; ok {
-		return Params(val.(map[string]interface{}))
-	}
-
-	return Params{}
-}
-
-func (p Params) GetA(key string) []interface{} {
+func (p Params) GetSlice(key string) []interface{} {
 	if val, ok := p[key]; ok {
 		return val.([]interface{})
 	}
@@ -43,7 +72,7 @@ func (p Params) GetA(key string) []interface{} {
 	return nil
 }
 
-func (p Params) GetAString(key string) []string {
+func (p Params) GetSliceStrings(key string) []string {
 	result := make([]string, 0)
 	if val, ok := p[key]; ok {
 		if val, ok := val.([]interface{}); ok {
