@@ -3,6 +3,7 @@ package gojison
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 type Params map[string]interface{}
@@ -54,6 +55,15 @@ func (p Params) GetFloat(key string) float64 {
 	}
 
 	return 0
+}
+
+func (p Params) GetTime(key string) time.Time {
+
+	if time, err := time.Parse(time.RFC3339, p.Get(key)); !err {
+		return time
+	}
+
+	return time.Time{}
 }
 
 func (p Params) GetI(key string) interface{} {
