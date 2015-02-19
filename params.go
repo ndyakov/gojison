@@ -2,6 +2,7 @@ package gojison
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -38,29 +39,58 @@ func (p Params) GetString(key string) string {
 }
 
 func (p Params) GetInt(key string) int {
-	if val, ok := p[key]; ok {
-		if vi, ok := val.(int); ok {
-			return vi
-		}
+	result, err := strconv.ParseInt(p.Get(key), 0, 0)
+	if err == nil {
+		return int(result)
 	}
 
 	return 0
 }
 
-func (p Params) GetFloat(key string) float64 {
-	if val, ok := p[key]; ok {
-		if vf, ok := val.(float64); ok {
-			return vf
-		}
+func (p Params) GetInt8(key string) int8 {
+	result, err := strconv.ParseInt(p.Get(key), 0, 8)
+	if err == nil {
+		return int8(result)
 	}
 
 	return 0
+}
+
+func (p Params) GetInt64(key string) int64 {
+	result, err := strconv.ParseInt(p.Get(key), 0, 64)
+	if err == nil {
+		return result
+	}
+
+	return 0
+}
+
+func (p Params) GetFloat32(key string) float32 {
+	result, err := strconv.ParseFloat(p.Get(key), 32)
+	if err == nil {
+		return float32(result)
+	}
+
+	return 0
+}
+
+func (p Params) GetFloat64(key string) float64 {
+	result, err := strconv.ParseFloat(p.Get(key), 64)
+	if err == nil {
+		return result
+	}
+
+	return 0
+}
+
+func (p Params) GetFloat(key string) float32 {
+	return p.GetFloat32(key)
 }
 
 func (p Params) GetTime(key string) time.Time {
 
-	if time, err := time.Parse(time.RFC3339, p.Get(key)); !err {
-		return time
+	if result, err := time.Parse(time.RFC3339, p.Get(key)); err == nil {
+		return result
 	}
 
 	return time.Time{}
