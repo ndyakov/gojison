@@ -21,9 +21,17 @@ func (p Params) GetP(key string) Params {
 	return Params{}
 }
 
+func (p Params) GetI(key string) interface{} {
+	if val, ok := p[key]; ok {
+		return val
+	}
+
+	return nil
+}
+
 func (p Params) Get(key string) string {
 	if val, ok := p[key]; ok {
-		return fmt.Sprintf("%v", val)
+		return stringify(val)
 	}
 
 	return ""
@@ -88,25 +96,17 @@ func (p Params) GetFloat(key string) float32 {
 }
 
 func (p Params) GetTime(key string) time.Time {
-
 	if result, err := time.Parse(time.RFC3339, p.Get(key)); err == nil {
 		return result
 	}
-
 	return time.Time{}
-}
-
-func (p Params) GetI(key string) interface{} {
-	if val, ok := p[key]; ok {
-		return val
-	}
-
-	return nil
 }
 
 func (p Params) GetSlice(key string) []interface{} {
 	if val, ok := p[key]; ok {
-		return val.([]interface{})
+		if val, ok := val.([]interface{}); ok {
+			return val
+		}
 	}
 
 	return nil
@@ -128,6 +128,23 @@ func (p Params) GetSliceStrings(key string) []string {
 	return nil
 }
 
+func (p Params) GetSliceInts(key string) []int {
+	result := make([]int, 0)
+	if val, ok := p[key]; ok {
+		if slice, ok := val.([]interface{}); ok {
+			for _, v := range slice {
+				if intVal, err := strconv.ParseInt(stringify(v), 0, 0); err == nil {
+					result = append(result, int(intVal))
+				}
+			}
+		}
+		return result
+	}
+
+	return nil
+}
+
+// Validators
 func (p Params) Required(keys ...string) error {
 	for _, key := range keys {
 		if ok := p.exists(p, key); !ok {
@@ -159,4 +176,12 @@ func (p Params) exists(input map[string]interface{}, key string) (ok bool) {
 	}
 
 	return ok
+}
+
+func stringify(v interface{}) string {
+	if vs, ok := v.(string); ok {
+		return vs
+	}
+
+	return fmt.Sprintf("%v", v)
 }
