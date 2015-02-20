@@ -30,35 +30,6 @@ var body = []byte(`
 }
 `)
 
-var bodyStrings = map[string]string{
-	"int":          "-10",
-	"int8":         "1",
-	"int64":        "123456",
-	"float64":      "3.14159265358979",
-	"string":       "test",
-	"arrayStrings": "[one two three]",
-	"arrayInts":    "[1 2 3 4]",
-}
-
-func parse(contents []byte) Params {
-	var params Params
-	request := bytes.NewReader(contents)
-	err := json.NewDecoder(request).Decode(&params)
-	if err != nil {
-		panic(err)
-	}
-	return params
-}
-
-func wrong(t *testing.T, method string, expected, got interface{}) {
-	t.Errorf(
-		"Params.%s was incorrect.\n Expected: %#v, Got: %#v",
-		method,
-		expected,
-		got,
-	)
-}
-
 func TestParamsUnmarshal(t *testing.T) {
 	var params Params
 	request := bytes.NewReader(body)
@@ -68,13 +39,141 @@ func TestParamsUnmarshal(t *testing.T) {
 	}
 }
 
+func TestParamsAdd(t *testing.T) {
+	p := Params{}
+	if _, ok := p["one"]; ok {
+		wrong(t, "[\"one\"]", false, true)
+	}
+
+	overwrite := p.Add("one", 2)
+	if overwrite {
+		wrong(t, "Add", false, true)
+	}
+
+	overwrite = p.Add("one", 1)
+	if !overwrite {
+		wrong(t, "Add", true, false)
+	}
+
+	if val, ok := p["one"]; !ok {
+		wrong(t, "[\"one\"]", true, false)
+		if val != 1 {
+			wrong(t, "[\"one\"]", 1, val)
+		}
+	}
+}
+
+func TestParamsAddRecursive(t *testing.T) {
+	p := Params{"one": 1}
+	// This should detect the recursive adding and
+	// should NOT add p with the params key.
+	p.Add("params", p)
+	if _, ok := p["params"]; ok {
+		wrong(t, "[\"params\"]", false, true)
+	}
+}
+
+func TestParamsRequired(t *testing.T) {
+	p := Params{"one": 1, "emtpyString": ""}
+	if err := p.Required("one"); err != nil {
+		wrong(t, "Required", nil, err)
+	}
+
+	if err := p.Required("emptyString"); err == nil {
+		wrong(t, "Required", "the parameter emptyString is required", nil)
+	}
+
+	if err := p.Required(); err != nil {
+		wrong(t, "Required", nil, err)
+	}
+
+	if err := p.Required("two"); err == nil {
+		wrong(t, "Required", "the parameter two is required", nil)
+	}
+
+	p1 := Params{"two": 2}
+	p.Add("nestedParams", p1)
+
+	if err := p.Required("nestedParams.one"); err == nil {
+		wrong(t, "Required", "the parameter nestedParams.one is required", nil)
+	}
+
+	if err := p.Required("nestedParams.two"); err != nil {
+		wrong(t, "Required", nil, err)
+	}
+
+	m := map[string]interface{}{"three": 3, "emptyString": ""}
+	p.Add("nestedMap", m)
+
+	if err := p.Required("nestedMap.one"); err == nil {
+		wrong(t, "Required", "the parameter nestedMap.one is required", nil)
+	}
+
+	if err := p.Required("nestedMap.three"); err != nil {
+		wrong(t, "Required", nil, err)
+	}
+
+	if err := p.Required("nestedMap.emptyString"); err == nil {
+		wrong(t, "Required", "the parameter nestedMap.emptyString is required", err)
+	}
+
+	if err := p.Required("missing.missing"); err == nil {
+		wrong(t, "Required", "the parameter missing.missing is required", nil)
+	}
+
+	if p.exists(nil, "nil") {
+		wrong(t, "exists", false, true)
+	}
+}
+
+func TestParamsDelete(t *testing.T) {
+	p := Params{"one": 1}
+	p.Remove("one")
+
+	if _, ok := p["one"]; ok {
+		wrong(t, "[\"one\"]", false, true)
+	}
+}
+
+func TestParamsEmpty(t *testing.T) {
+	p := Params{}
+	if !p.Empty() {
+		wrong(t, "Empty", true, false)
+	}
+
+	p.Add("one", 1)
+
+	if p.Empty() {
+		wrong(t, "Empty", false, true)
+	}
+}
+
 func TestParamsGet(t *testing.T) {
-	keys := []string{"int", "int8", "int64", "float64", "string", "arrayString", "arrayInt"}
+	keys := []string{
+		"int",
+		"int8",
+		"int64",
+		"float64",
+		"string",
+		"arrayString",
+		"arrayInt",
+	}
+
+	expected := map[string]string{
+		"int":          "-10",
+		"int8":         "1",
+		"int64":        "123456",
+		"float64":      "3.14159265358979",
+		"string":       "test",
+		"arrayStrings": "[one two three]",
+		"arrayInts":    "[1 2 3 4]",
+	}
+
 	params := parse(body)
 	for _, key := range keys {
 		got := params.Get(key)
-		if got != bodyStrings[key] {
-			wrong(t, "Get", bodyStrings[key], got)
+		if got != expected[key] {
+			wrong(t, "Get", expected[key], got)
 		}
 	}
 }
@@ -275,6 +374,25 @@ func TestParamsGetSlice(t *testing.T) {
 			wrong(t, "GetSlice", expected[key], got)
 		}
 	}
+}
+
+func parse(contents []byte) Params {
+	var params Params
+	request := bytes.NewReader(contents)
+	err := json.NewDecoder(request).Decode(&params)
+	if err != nil {
+		panic(err)
+	}
+	return params
+}
+
+func wrong(t *testing.T, method string, expected, got interface{}) {
+	t.Errorf(
+		"Params.%s was incorrect.\n Expected: %#v, Got: %#v",
+		method,
+		expected,
+		got,
+	)
 }
 
 // Comparing slices

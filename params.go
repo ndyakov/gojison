@@ -9,13 +9,34 @@ import (
 
 type Params map[string]interface{}
 
-func (p Params) Add(key string, value interface{}) {
+func (p Params) Add(key string, value interface{}) bool {
+	if fmt.Sprintf("%p", p) == fmt.Sprintf("%p", value) {
+		return false
+	}
+
+	_, ok := p[key]
 	p[key] = value
+	return ok
+}
+
+func (p Params) Empty() bool {
+	for _ = range p {
+		return false
+	}
+	return true
+}
+
+func (p Params) Remove(key string) {
+	delete(p, key)
 }
 
 func (p Params) GetP(key string) Params {
 	if val, ok := p[key]; ok {
-		return Params(val.(map[string]interface{}))
+		if vmap, ok := val.(map[string]interface{}); ok {
+			return Params(vmap)
+		} else if vp, ok := val.(Params); ok {
+			return vp
+		}
 	}
 
 	return Params{}
@@ -113,7 +134,7 @@ func (p Params) GetSlice(key string) []interface{} {
 }
 
 func (p Params) GetSliceStrings(key string) []string {
-	result := make([]string, 0)
+	var result []string
 	if val, ok := p[key]; ok {
 		if val, ok := val.([]interface{}); ok {
 			for _, v := range val {
@@ -129,7 +150,7 @@ func (p Params) GetSliceStrings(key string) []string {
 }
 
 func (p Params) GetSliceInts(key string) []int {
-	result := make([]int, 0)
+	var result []int
 	if val, ok := p[key]; ok {
 		if slice, ok := val.([]interface{}); ok {
 			for _, v := range slice {
@@ -148,7 +169,7 @@ func (p Params) GetSliceInts(key string) []int {
 func (p Params) Required(keys ...string) error {
 	for _, key := range keys {
 		if ok := p.exists(p, key); !ok {
-			return fmt.Errorf("The parameter %s is required!", key)
+			return fmt.Errorf("the parameter %s is required", key)
 		}
 	}
 
@@ -161,11 +182,18 @@ func (p Params) exists(input map[string]interface{}, key string) (ok bool) {
 	}
 
 	if index := strings.Index(key, "."); index != -1 {
+		var casted bool
+		var params map[string]interface{}
 		pair := strings.SplitN(key, ".", 2)
-		params, asserted := input[pair[0]].(map[string]interface{})
-		if !asserted {
+
+		if params, casted = input[pair[0]].(Params); !casted {
+			params, casted = input[pair[0]].(map[string]interface{})
+		}
+
+		if !casted {
 			return false
 		}
+
 		ok = p.exists(params, pair[1])
 	} else {
 		var v interface{}
