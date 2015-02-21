@@ -273,7 +273,44 @@ func TestParamsGetURLValues(t *testing.T) {
 	}
 	params := parse(body)
 	params.Add("inParams", Params{"one": 1})
-	urlValues := params.GetURLValues()
+	urlValues := params.GetURLValues("", "")
+	for _, key := range keys {
+		got := urlValues.Get(key)
+		if got != expected[key] {
+			wrong(t, fmt.Sprintf("GetURLValues key: %s", key), expected[key], got)
+		}
+	}
+}
+
+func TestParamsGetURLValuesWithPrefixAndSufix(t *testing.T) {
+	keys := []string{
+		"int",
+		"int8",
+		"int64",
+		"float64",
+		"string",
+		"arrayString",
+		"arrayInt",
+		"nestedParams[one]",
+		"nestedParams[params2][three]",
+		"inParams[one]",
+	}
+
+	expected := map[string]string{
+		"int":                          "-10",
+		"int8":                         "1",
+		"int64":                        "123456",
+		"float64":                      "3.14159265358979",
+		"string":                       "test",
+		"arrayStrings":                 "one",
+		"arrayInts":                    "1",
+		"nestedParams[one]":            "1",
+		"nestedParams[params2][three]": "3",
+		"inParams[one]":                "1",
+	}
+	params := parse(body)
+	params.Add("inParams", Params{"one": 1})
+	urlValues := params.GetURLValues("[", "]")
 	for _, key := range keys {
 		got := urlValues.Get(key)
 		if got != expected[key] {

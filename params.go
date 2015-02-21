@@ -167,20 +167,25 @@ func (p Params) GetSliceInts(key string) []int {
 }
 
 // Get map[string][]string
-func (p Params) GetURLValues() url.Values {
-	return p.getURLValues(p)
+func (p Params) GetURLValues(prefix, sufix string) url.Values {
+	return p.getURLValues(p, prefix, sufix, false)
 }
 
-func (p Params) getURLValues(set Params) url.Values {
+func (p Params) getURLValues(set Params, prefix, sufix string, subParse bool) url.Values {
+	if prefix == "" {
+		prefix = "."
+		sufix = ""
+	}
+
 	result := url.Values{}
 	var subset url.Values
 	for key, value := range set {
 		var foundSubset bool
 		if v, ok := value.(Params); ok {
-			subset = p.getURLValues(v)
+			subset = p.getURLValues(v, prefix, sufix, true)
 			foundSubset = true
 		} else if v, ok := value.(map[string]interface{}); ok {
-			subset = p.getURLValues(Params(v))
+			subset = p.getURLValues(Params(v), prefix, sufix, true)
 			foundSubset = true
 		} else if v, ok := value.([]interface{}); ok {
 			for _, el := range v {
@@ -190,11 +195,18 @@ func (p Params) getURLValues(set Params) url.Values {
 		}
 		if foundSubset {
 			for k, v := range subset {
-				nestedKey := fmt.Sprintf("%s.%s", key, k)
+				nestedKey := fmt.Sprintf("%s%s", key, k)
+				if subParse {
+					nestedKey = fmt.Sprintf("%s%s%s%s", prefix, key, sufix, k)
+				}
 				result[nestedKey] = append(result[nestedKey], v...)
 			}
 		} else {
-			result[key] = append(result[key], stringify(value))
+			valueKey := key
+			if subParse {
+				valueKey = fmt.Sprintf("%s%s%s", prefix, key, sufix)
+			}
+			result[valueKey] = append(result[valueKey], stringify(value))
 		}
 	}
 	return result
