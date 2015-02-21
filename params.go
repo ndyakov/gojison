@@ -167,20 +167,20 @@ func (p Params) GetSliceInts(key string) []int {
 }
 
 // Get map[string][]string
-func (p Params) GetUrlValues() url.Values {
-	return p.getUrlValues(p)
+func (p Params) GetURLValues() url.Values {
+	return p.getURLValues(p)
 }
 
-func (p Params) getUrlValues(set Params) url.Values {
+func (p Params) getURLValues(set Params) url.Values {
 	result := url.Values{}
 	var subset url.Values
 	for key, value := range set {
 		var foundSubset bool
 		if v, ok := value.(Params); ok {
-			subset = p.getUrlValues(v)
+			subset = p.getURLValues(v)
 			foundSubset = true
 		} else if v, ok := value.(map[string]interface{}); ok {
-			subset = p.getUrlValues(Params(v))
+			subset = p.getURLValues(Params(v))
 			foundSubset = true
 		} else if v, ok := value.([]interface{}); ok {
 			for _, el := range v {

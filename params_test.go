@@ -245,7 +245,7 @@ func TestParamsGetI(t *testing.T) {
 	}
 }
 
-func TestParamsGetUrlValues(t *testing.T) {
+func TestParamsGetURLValues(t *testing.T) {
 	keys := []string{
 		"int",
 		"int8",
@@ -273,11 +273,11 @@ func TestParamsGetUrlValues(t *testing.T) {
 	}
 	params := parse(body)
 	params.Add("inParams", Params{"one": 1})
-	urlValues := params.GetUrlValues()
+	urlValues := params.GetURLValues()
 	for _, key := range keys {
 		got := urlValues.Get(key)
 		if got != expected[key] {
-			wrong(t, fmt.Sprintf("GetUrlValues key: %s", key), expected[key], got)
+			wrong(t, fmt.Sprintf("GetURLValues key: %s", key), expected[key], got)
 		}
 	}
 }
