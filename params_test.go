@@ -245,7 +245,7 @@ func TestParamsGetI(t *testing.T) {
 	}
 }
 
-func TestParamsGetURLValues(t *testing.T) {
+func TestParamsURLValues(t *testing.T) {
 	keys := []string{
 		"int",
 		"int8",
@@ -273,16 +273,16 @@ func TestParamsGetURLValues(t *testing.T) {
 	}
 	params := parse(body)
 	params.Add("inParams", Params{"one": 1})
-	urlValues := params.GetURLValues("", "")
+	urlValues := params.URLValues("", "")
 	for _, key := range keys {
 		got := urlValues.Get(key)
 		if got != expected[key] {
-			wrong(t, fmt.Sprintf("GetURLValues key: %s", key), expected[key], got)
+			wrong(t, fmt.Sprintf("URLValues key: %s", key), expected[key], got)
 		}
 	}
 }
 
-func TestParamsGetURLValuesWithPrefixAndSufix(t *testing.T) {
+func TestParamsURLValuesWithPrefixAndSufix(t *testing.T) {
 	keys := []string{
 		"int",
 		"int8",
@@ -310,11 +310,11 @@ func TestParamsGetURLValuesWithPrefixAndSufix(t *testing.T) {
 	}
 	params := parse(body)
 	params.Add("inParams", Params{"one": 1})
-	urlValues := params.GetURLValues("[", "]")
+	urlValues := params.URLValues("[", "]")
 	for _, key := range keys {
 		got := urlValues.Get(key)
 		if got != expected[key] {
-			wrong(t, fmt.Sprintf("GetURLValues key: %s", key), expected[key], got)
+			wrong(t, fmt.Sprintf("URLValues key: %s", key), expected[key], got)
 		}
 	}
 }

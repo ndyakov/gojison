@@ -166,12 +166,12 @@ func (p Params) GetSliceInts(key string) []int {
 	return nil
 }
 
-// Get map[string][]string
-func (p Params) GetURLValues(prefix, sufix string) url.Values {
-	return p.getURLValues(p, prefix, sufix, false)
+// Transform to map[string][]string
+func (p Params) URLValues(prefix, sufix string) url.Values {
+	return p.toURLValues(p, prefix, sufix, false)
 }
 
-func (p Params) getURLValues(set Params, prefix, sufix string, subParse bool) url.Values {
+func (p Params) toURLValues(set Params, prefix, sufix string, subParse bool) url.Values {
 	if prefix == "" {
 		prefix = "."
 		sufix = ""
@@ -182,10 +182,10 @@ func (p Params) getURLValues(set Params, prefix, sufix string, subParse bool) ur
 	for key, value := range set {
 		var foundSubset bool
 		if v, ok := value.(Params); ok {
-			subset = p.getURLValues(v, prefix, sufix, true)
+			subset = p.toURLValues(v, prefix, sufix, true)
 			foundSubset = true
 		} else if v, ok := value.(map[string]interface{}); ok {
-			subset = p.getURLValues(Params(v), prefix, sufix, true)
+			subset = p.toURLValues(Params(v), prefix, sufix, true)
 			foundSubset = true
 		} else if v, ok := value.([]interface{}); ok {
 			for _, el := range v {
