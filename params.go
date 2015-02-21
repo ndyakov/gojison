@@ -2,6 +2,7 @@ package gojison
 
 import (
 	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -163,6 +164,40 @@ func (p Params) GetSliceInts(key string) []int {
 	}
 
 	return nil
+}
+
+// Get map[string][]string
+func (p Params) GetUrlValues() url.Values {
+	return p.getUrlValues(p)
+}
+
+func (p Params) getUrlValues(set Params) url.Values {
+	result := url.Values{}
+	var subset url.Values
+	for key, value := range set {
+		var foundSubset bool
+		if v, ok := value.(Params); ok {
+			subset = p.getUrlValues(v)
+			foundSubset = true
+		} else if v, ok := value.(map[string]interface{}); ok {
+			subset = p.getUrlValues(Params(v))
+			foundSubset = true
+		} else if v, ok := value.([]interface{}); ok {
+			for _, el := range v {
+				result[key] = append(result[key], stringify(el))
+			}
+			continue
+		}
+		if foundSubset {
+			for k, v := range subset {
+				nestedKey := fmt.Sprintf("%s.%s", key, k)
+				result[nestedKey] = append(result[nestedKey], v...)
+			}
+		} else {
+			result[key] = append(result[key], stringify(value))
+		}
+	}
+	return result
 }
 
 // Validators
