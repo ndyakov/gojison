@@ -20,7 +20,7 @@ var body = []byte(`
 	"incorectTime": "2015-02-20",
 	"arrayStrings": ["one","two","three"],
 	"arrayInts": [1,2,3,4],
-	"params": {
+	"nestedParams": {
 		"one": 1,
 		"two": 2,
 		"params2": {
@@ -175,6 +175,73 @@ func TestParamsGet(t *testing.T) {
 		if got != expected[key] {
 			wrong(t, "Get", expected[key], got)
 		}
+	}
+}
+
+func TestParamsGetP(t *testing.T) {
+	keys := []string{"one", "two"}
+	expected := map[string]string{
+		"one": "1",
+		"two": "2",
+	}
+	params := parse(body)
+	nestedParams := params.GetP("nestedParams")
+	if nestedParams.Empty() {
+		wrong(t, "GetP", "existing nested params", "empty params set")
+	}
+
+	for _, key := range keys {
+		got := nestedParams.Get(key)
+		if got != expected[key] {
+			wrong(t, "Get", expected[key], got)
+		}
+	}
+
+	nestedParams.Add("whoah", Params{"one": 1})
+	whoah := nestedParams.GetP("whoah")
+	if whoah.Empty() {
+		wrong(t, "GetP", "existing nested params", "empty params set")
+	}
+
+	missing := whoah.GetP("missing")
+	if !missing.Empty() {
+		wrong(t, "GetP", "to return empty Params when missing", "something that was not empty")
+	}
+}
+
+// Well... this will return the same as
+// p[key].
+func TestParamsGetI(t *testing.T) {
+	keys := []string{
+		"int",
+		"string",
+		"time",
+		"incorectTime",
+		"arrayStrings",
+		"missing",
+	}
+
+	params := parse(body)
+	for _, key := range keys {
+		got := params.GetI(key)
+		v := params[key]
+		if stringify(got) != stringify(v) {
+			wrong(t, "GetI", v, got)
+		}
+	}
+
+	now := time.Now()
+	params.Add("now", now)
+	t1 := params.GetI("now").(time.Time)
+	if now != t1 {
+		wrong(t, "GetI", now, t1)
+	}
+
+	// or even pointers
+	params.Add("testing", t)
+	ti := params.GetI("testing").(*testing.T)
+	if t != ti {
+		wrong(t, "GetI", t, ti)
 	}
 }
 
