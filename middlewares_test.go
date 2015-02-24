@@ -9,9 +9,6 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-func init() {
-}
-
 func TestResponse(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := &http.Request{}
