@@ -32,7 +32,7 @@ func TestRequest(t *testing.T) {
 	`)
 	body := bytes.NewBuffer(request)
 	w := httptest.NewRecorder()
-	c := &web.C{Env: make(map[string]interface{})}
+	c := &web.C{Env: make(map[interface{}]interface{})}
 	r, err := http.NewRequest("POST", "/", body)
 
 	if err != nil {
@@ -71,7 +71,7 @@ func TestRequestWithoutJSON(t *testing.T) {
 	request := []byte{}
 	body := bytes.NewBuffer(request)
 	w := httptest.NewRecorder()
-	c := &web.C{Env: make(map[string]interface{})}
+	c := &web.C{Env: make(map[interface{}]interface{})}
 	r, err := http.NewRequest("GET", "/", body)
 
 	if err != nil {
@@ -93,7 +93,7 @@ func TestRequestWithInvalidBody(t *testing.T) {
 	`)
 	body := bytes.NewBuffer(request)
 	w := httptest.NewRecorder()
-	c := &web.C{Env: make(map[string]interface{})}
+	c := &web.C{Env: make(map[interface{}]interface{})}
 	r, err := http.NewRequest("POST", "/", body)
 
 	if err != nil {
