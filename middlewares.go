@@ -6,6 +6,7 @@ import (
 
 	"encoding/json"
 
+	"github.com/ndyakov/whatever"
 	"github.com/zenazn/goji/web"
 )
 
@@ -20,7 +21,7 @@ func Request(c *web.C, h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
 		contentTypeSlice := strings.Split(r.Header.Get("Content-Type"), ";")
 		if contentTypeSlice[0] == "application/json" {
-			var params Params
+			var params whatever.Params
 			c.Env["GojisonDecodeError"] = json.NewDecoder(r.Body).Decode(&params)
 			c.Env["Params"] = params
 		}

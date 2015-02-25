@@ -6,8 +6,18 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ndyakov/whatever"
 	"github.com/zenazn/goji/web"
 )
+
+func wrong(t *testing.T, method string, expected, got interface{}) {
+	t.Errorf(
+		"whatever.Params.%s was incorrect.\n Expected: %#v, Got: %#v",
+		method,
+		expected,
+		got,
+	)
+}
 
 func TestResponse(t *testing.T) {
 	w := httptest.NewRecorder()
@@ -46,7 +56,7 @@ func TestRequest(t *testing.T) {
 		t.Error("Expected params to be set into the context.")
 	}
 
-	params, ok := paramsAsInterface.(Params)
+	params, ok := paramsAsInterface.(whatever.Params)
 	if params == nil || !ok {
 		t.Error("Expected params to be unmarshalled into the context.")
 	}
