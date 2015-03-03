@@ -22,32 +22,32 @@
 //
 // Example:
 //
-//		package main
+//     package main
 //
-//		import (
-//				"fmt"
-//				"net/http"
+//     import (
+//         "fmt"
+//         "net/http"
 //
-//				"github.com/zenazn/goji"
-//				"github.com/zenazn/goji/web"
-//				"github.com/ndyakov/whatever"
-//				"github.com/ndyakov/gojison"
-//		)
+//         "github.com/zenazn/goji"
+//         "github.com/zenazn/goji/web"
+//         "github.com/ndyakov/whatever"
+//         "github.com/ndyakov/gojison"
+//     )
 //
-//		func main() {
-//				goji.Use(gojison.Request)
-//				goji.Use(gojison.Response)
-//				goji.Post("/save", handleSave)
-//				goji.Serve()
-//		}
+//     func main() {
+//         goji.Use(gojison.Request)
+//         goji.Use(gojison.Response)
+//         goji.Post("/save", handleSave)
+//         goji.Serve()
+//     }
 //
-//		func handleSave(c web.C, w http.ResponseWriter, r *http.Request) {
-//				params := c.Env["Params"].(whatever.Params)
-//				if err := params.Required("user.name", "user.email"); err != nil {
-//						gojison.Error(err, 0)
-//						return
-//				}
-//				// do something...
-//				gojison.Success("saved", 0)
-//		}
+//     func handleSave(c web.C, w http.ResponseWriter, r *http.Request) {
+//         params := c.Env["Params"].(whatever.Params)
+//         if err := params.Required("user.name", "user.email"); err != nil {
+//             gojison.Error(err, 0)
+//             return
+//         }
+//         // do something...
+//         gojison.Success("saved", 0)
+//     }
 package gojison
