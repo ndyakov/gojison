@@ -1,14 +1,14 @@
 # gojison
 
-Package __gojison__ provides two simple middlewares
-for working with JSON data in goji and two simple
-helper function to write out Error and Success responses
-to the http.RequestWriter.
-
 [![BuildStatus](https://travis-ci.org/ndyakov/gojison.png)](https://travis-ci.org/ndyakov/gojison)
 [![Coverage Status](https://coveralls.io/repos/ndyakov/gojison/badge.svg?branch=master)](https://coveralls.io/r/ndyakov/gojison?branch=master)
 [![GoDoc](https://godoc.org/github.com/ndyakov/gojison?status.png)](https://godoc.org/github.com/ndyakov/gojison)
 [![status](https://sourcegraph.com/api/repos/github.com/ndyakov/gojison/.badges/status.svg)](https://sourcegraph.com/github.com/ndyakov/gojison)
+
+Package __gojison__ provides two simple middlewares
+for working with JSON data in goji and two simple
+helper function to write out Error and Success responses
+to the http.RequestWriter.
 
 ## Example
 
