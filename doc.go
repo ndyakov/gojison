@@ -37,7 +37,7 @@
 //		func main() {
 //				goji.Use(gojison.Request)
 //				goji.Use(gojison.Response)
-//				goji.Get("/save", handleSave)
+//				goji.Post("/save", handleSave)
 //				goji.Serve()
 //		}
 //
