@@ -10,6 +10,39 @@ to the http.RequestWriter.
 [![GoDoc](https://godoc.org/github.com/ndyakov/gojison?status.png)](https://godoc.org/github.com/ndyakov/gojison)
 [![status](https://sourcegraph.com/api/repos/github.com/ndyakov/gojison/.badges/status.svg)](https://sourcegraph.com/github.com/ndyakov/gojison)
 
+## Example
+
+```go
+package main
+
+import (
+    "fmt"
+    "net/http"
+
+    "github.com/zenazn/goji"
+    "github.com/zenazn/goji/web"
+    "github.com/ndyakov/whatever"
+    "github.com/ndyakov/gojison"
+)
+
+func main() {
+    goji.Use(gojison.Request)
+    goji.Use(gojison.Response)
+    goji.Get("/save", handleSave)
+    goji.Serve()
+}
+
+func HandleSave(c web.C, w http.ResponseWriter, r *http.Request) {
+    params := c.Env["Params"].(whatever.Params)
+    if err := params.Required("user.name", "user.email"); err != nil {
+        gojison.Error(err, 0)
+        return
+    }
+    // do something...
+    gojison.Success("saved", 0)
+}
+```
+
 ## Install
 
 ### Get the package
@@ -52,39 +85,6 @@ success message as json and set the response code.
 If the response code argument is 0, the following will be used:
 * 400(http.StatusBadRequest) for Error
 * 200(http.StatusOK) for Success
-
-## Example
-
-```go
-package main
-
-import (
-    "fmt"
-    "net/http"
-
-    "github.com/zenazn/goji"
-    "github.com/zenazn/goji/web"
-    "github.com/ndyakov/whatever"
-    "github.com/ndyakov/gojison"
-)
-
-func main() {
-    goji.Use(gojison.Request)
-    goji.Use(gojison.Response)
-    goji.Get("/save", handleSave)
-    goji.Serve()
-}
-
-func HandleSave(c web.C, w http.ResponseWriter, r *http.Request) {
-    params := c.Env["Params"].(whatever.Params)
-    if err := params.Required("user.name", "user.email"); err != nil {
-        gojison.Error(err, 0)
-        return
-    }
-    // do something...
-    gojison.Success("saved", 0)
-}
-```
 
 ## Contributions
 
