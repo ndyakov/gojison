@@ -20,20 +20,34 @@
 // http://godoc.org/github.com/ndyakov/whatever
 //
 //
-// Usage:
+// Example:
 //
-//     goji.Use(gojison.Request)
-//     goji.Use(gojison.Response)
+//		package main
 //
-// And in your handlers you can use the following:
+//		import (
+//				"fmt"
+//				"net/http"
 //
-//     func HandleSave(c web.C, w http.ResponseWriter, r *http.Request) {
-//         params := c.Env["Params"].(whatever.Params)
-//         if err := params.Required("user.name", "user.email"); err != nil {
-//             gojison.Error(err, 0)
-//             return
-//         }
-//         // do something...
-//         gojison.Success("saved", 0)
-//     }
+//				"github.com/zenazn/goji"
+//				"github.com/zenazn/goji/web"
+//				"github.com/ndyakov/whatever"
+//				"github.com/ndyakov/gojison"
+//		)
+//
+//		func main() {
+//				goji.Use(gojison.Request)
+//				goji.Use(gojison.Response)
+//				goji.Get("/save", handleSave)
+//				goji.Serve()
+//		}
+//
+//		func handleSave(c web.C, w http.ResponseWriter, r *http.Request) {
+//				params := c.Env["Params"].(whatever.Params)
+//				if err := params.Required("user.name", "user.email"); err != nil {
+//						gojison.Error(err, 0)
+//						return
+//				}
+//				// do something...
+//				gojison.Success("saved", 0)
+//		}
 package gojison

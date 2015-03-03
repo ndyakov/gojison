@@ -32,7 +32,7 @@ func main() {
     goji.Serve()
 }
 
-func HandleSave(c web.C, w http.ResponseWriter, r *http.Request) {
+func handleSave(c web.C, w http.ResponseWriter, r *http.Request) {
     params := c.Env["Params"].(whatever.Params)
     if err := params.Required("user.name", "user.email"); err != nil {
         gojison.Error(err, 0)
