@@ -74,7 +74,7 @@ func TestRequest(t *testing.T) {
 	}
 }
 
-func TestRequestWithoutJSON(t *testing.T) {
+func TestRequest_withoutJSON(t *testing.T) {
 	request := []byte{}
 	body := bytes.NewBuffer(request)
 	w := httptest.NewRecorder()
@@ -94,7 +94,7 @@ func TestRequestWithoutJSON(t *testing.T) {
 	}
 }
 
-func TestRequestWithInvalidBody(t *testing.T) {
+func TestRequest_withInvalidBody(t *testing.T) {
 	request := []byte(`
 		{"one"}
 	`)
