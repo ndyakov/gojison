@@ -66,7 +66,7 @@ This middleware will set the content type of the response to
 
 This middlware will unmarshal the request parameters to an
 [whatever.Params](http://godoc.org/github.com/ndyakov/whatever) structure
-and the attach it to the goji context map.
+and then attach it to the goji context map.
 You can access that structure from the context and work with it as either
 `map[string]iterface{}` or `whatever.Params`
 
